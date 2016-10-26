@@ -3,15 +3,13 @@ package com.ider.filemanager;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.CardView;
+import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
+import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.view.LayoutInflater;
-import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
-
-import com.ider.filemanager.FullscreenActivity;
 
 import java.util.ArrayList;
 
@@ -27,10 +25,10 @@ public class SmbActivity extends FullscreenActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_smb);
-
         smbGroup = (RecyclerView) findViewById(R.id.smb_group);
-        LinearLayoutManager layoutManager = new LinearLayoutManager(this);
+        StaggeredGridLayoutManager layoutManager = new StaggeredGridLayoutManager(4, StaggeredGridLayoutManager.VERTICAL);
         smbGroup.setLayoutManager(layoutManager);
+        smbGroup.addItemDecoration(new SmbItemDecorator(this));
         SmbAdapter adapter = new SmbAdapter(getData());
         smbGroup.setAdapter(adapter);
 
@@ -39,11 +37,9 @@ public class SmbActivity extends FullscreenActivity {
 
     public ArrayList<String> getData() {
         ArrayList<String> list = new ArrayList<>();
-        list.add("adbc");
-        list.add("jack");
-        list.add("ider");
-        list.add("eric");
-        list.add("worker");
+        for(int i = 0; i < 50; i++) {
+            list.add("abc");
+        }
         return list;
     }
 
@@ -59,6 +55,9 @@ public class SmbActivity extends FullscreenActivity {
         public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
             CardView cardView = (CardView) LayoutInflater.from(parent.getContext())
                     .inflate(R.layout.smb_server_item, parent, false);
+            RecyclerView.LayoutParams lp = (RecyclerView.LayoutParams) cardView.getLayoutParams();
+            lp.height = (int) (Math.random() * 100 + 100);
+            cardView.requestLayout();
             return new SmbViewHolder(cardView);
         }
 
