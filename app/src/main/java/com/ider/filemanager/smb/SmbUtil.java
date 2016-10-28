@@ -12,7 +12,7 @@ import java.util.Vector;
 
 public class SmbUtil {
 
-    private static boolean DEBUG = true;
+    private static boolean DEBUG = false;
     private static String TAG = "SmbUtil";
 
     public final static int SMB_SEARCH_UPDATE = 100;
@@ -23,6 +23,7 @@ public class SmbUtil {
     private boolean searchInterupt;
     private int startThread, overThread;
     private int THREAD_MAX = 16;
+    private int THREAD_TOTAL = 0;
 
     private static void LOG(String str) {
         if (DEBUG) {
@@ -40,12 +41,23 @@ public class SmbUtil {
         startThread = 0;
         overThread = 0;
         Vector<Vector<InetAddress>> vectorList = Lan.getSubnetAddress();
-        Log.i("tag", "vectorlist.size = " + vectorList.size());
+
+        for(int i = 0; i < vectorList.size(); i++) {
+            Vector<InetAddress> addrs = vectorList.get(i);
+            THREAD_TOTAL += addrs.size();
+        }
+
         for (int i = 0; i < vectorList.size(); i++) {
-            if(searchInterupt) return;
+            if(searchInterupt) {
+                updateListener.onSearchInterupt();
+                return;
+            }
             Vector<InetAddress> addrs = vectorList.get(i);
             for (int j = 0; j < addrs.size(); ) {
-                if(searchInterupt) return;
+                if(searchInterupt) {
+                    updateListener.onSearchInterupt();
+                    return;
+                }
                 int activeThread = startThread - overThread;
                 if(activeThread < THREAD_MAX) {
                     InetAddress addr = addrs.get(j);
@@ -77,15 +89,18 @@ public class SmbUtil {
         @Override
         public void run() {
             if(Lan.ping(addr.getHostAddress())) {
-                if(searchInterupt) return;
+                if(searchInterupt) {
+                    updateListener.onSearchInterupt();
+                    return;
+                }
                 sendAvailableHost(addr);
             }
             overThread++;
+            updateListener.onProgressUpdate(THREAD_TOTAL, overThread);
         }
     }
 
     private synchronized void sendAvailableHost(InetAddress iNetAddress) {
-        LOG("ping OK : " + iNetAddress.getHostAddress());
         String server = mDirSmb + File.separator + iNetAddress.getHostAddress();
 
         updateListener.onSmbUpdate(server);

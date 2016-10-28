@@ -6,4 +6,6 @@ package com.ider.filemanager.smb;
 
 public interface ISmbUpdateListener {
     public void onSmbUpdate(String server);
+    public void onProgressUpdate(int max, int progress);
+    public void onSearchInterupt();
 }

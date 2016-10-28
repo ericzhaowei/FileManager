@@ -8,5 +8,7 @@ import java.net.InetAddress;
 
 public interface ISmbView {
     public void smbServerUpdate(String server);
-
+    public void hideSearchView();
+    public void updateProgress(int max, int progress);
+    public void hideSearchProgress();
 }

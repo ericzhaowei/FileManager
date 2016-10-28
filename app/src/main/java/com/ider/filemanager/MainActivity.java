@@ -9,7 +9,7 @@ import android.widget.Button;
 import com.ider.filemanager.smb.ISmbView;
 import com.ider.filemanager.smb.SmbPresenter;
 
-public class MainActivity extends FullscreenActivity implements View.OnClickListener, ISmbView {
+public class MainActivity extends FullscreenActivity implements View.OnClickListener {
 
     Button samba;
     SmbPresenter smbPresenter;
@@ -19,8 +19,6 @@ public class MainActivity extends FullscreenActivity implements View.OnClickList
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-        smbPresenter = new SmbPresenter(this, mHandler);
 
         initViews();
         setListeners();
@@ -47,8 +45,4 @@ public class MainActivity extends FullscreenActivity implements View.OnClickList
         }
     }
 
-    @Override
-    public void smbServerUpdate(String server) {
-        samba.setText(server);
-    }
 }

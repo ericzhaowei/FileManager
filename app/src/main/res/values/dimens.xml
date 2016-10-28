@@ -2,4 +2,9 @@
     <!-- Default screen margins, per the Android Design guidelines. -->
     <dimen name="activity_horizontal_margin">16dp</dimen>
     <dimen name="activity_vertical_margin">16dp</dimen>
+    <dimen name="smb_server_group_height">210dp</dimen>
+    <dimen name="smb_server_item_height">200dp</dimen>
+    <dimen name="smb_server_item_width">140dp</dimen>
+    <dimen name="smb_server_item_title_bottom">10dp</dimen>
+
 </resources>

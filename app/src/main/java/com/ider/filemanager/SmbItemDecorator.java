@@ -23,21 +23,6 @@ public class SmbItemDecorator extends RecyclerView.ItemDecoration {
         ta.recycle();
     }
 
-    @Override
-    public void onDraw(Canvas c, RecyclerView parent, RecyclerView.State state) {
-
-        int left = parent.getPaddingLeft();
-        int right = parent.getWidth() - parent.getPaddingRight();
-
-        int childCount = parent.getChildCount();
-        for(int i = 0; i < childCount - 1; i++) {
-            View child = parent.getChildAt(i);
-            int top = child.getBottom();
-            int bottom = top + mDiver.getIntrinsicHeight();
-            mDiver.setBounds(left, top, right, bottom);
-            mDiver.draw(c);
-        }
-    }
 
     @Override
     public void getItemOffsets(Rect outRect, View view, RecyclerView parent, RecyclerView.State state) {
@@ -48,6 +33,6 @@ public class SmbItemDecorator extends RecyclerView.ItemDecoration {
          * right:item右边留出的长度
          * bottom:item下边留出的宽度
          */
-        outRect.set(0, 0, 0, mDiver.getIntrinsicHeight());
+        outRect.set(20, 0, 20, 0);
     }
 }

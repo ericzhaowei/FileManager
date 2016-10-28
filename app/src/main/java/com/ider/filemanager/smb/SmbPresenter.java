@@ -32,9 +32,29 @@ public class SmbPresenter implements ISmbUpdateListener {
         mHandler.post(new Runnable() {
             @Override
             public void run() {
+                smbView.hideSearchView();
                 smbView.smbServerUpdate(server);
             }
         });
+    }
 
+    @Override
+    public void onProgressUpdate(final int max, final int progress) {
+        mHandler.post(new Runnable() {
+            @Override
+            public void run() {
+                smbView.updateProgress(max, progress);
+            }
+        });
+    }
+
+    @Override
+    public void onSearchInterupt() {
+        mHandler.post(new Runnable() {
+            @Override
+            public void run() {
+                smbView.hideSearchProgress();
+            }
+        });
     }
 }

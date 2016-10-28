@@ -84,7 +84,6 @@ public class Lan {
                             iNetAddrhost[1] = (byte) b;
                             iNetAddrhost[2] = (byte) c;
                             iNetAddrhost[3] = (byte) d;
-                            Log.i("tag", "iNetAddrhost : " + a + "." + b + "." + c + "." + d);
                             try {
                                 InetAddress inetAddress = InetAddress.getByAddress(iNetAddrhost);
                                 vector.add(inetAddress);
