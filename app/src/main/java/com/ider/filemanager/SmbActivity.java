@@ -6,6 +6,7 @@ import android.support.annotation.Nullable;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
@@ -57,9 +58,6 @@ public class SmbActivity extends FullscreenActivity implements ISmbView {
     }
 
 
-
-
-
     public void addServerItem(String server) {
         servers.add(server);
         adapter.notifyDataSetChanged();
@@ -69,6 +67,7 @@ public class SmbActivity extends FullscreenActivity implements ISmbView {
     class SmbAdapter extends RecyclerView.Adapter {
 
         ArrayList<String> list;
+
         private SmbAdapter(ArrayList<String> list) {
             this.list = list;
         }
@@ -95,6 +94,7 @@ public class SmbActivity extends FullscreenActivity implements ISmbView {
     class SmbViewHolder extends RecyclerView.ViewHolder {
         CardView cardView;
         TextView title;
+
         SmbViewHolder(CardView itemView) {
             super(itemView);
             this.cardView = itemView;
@@ -112,13 +112,14 @@ public class SmbActivity extends FullscreenActivity implements ISmbView {
     @Override
     public void hideSearchView() {
         searchImage.setVisibility(View.GONE);
+
     }
 
     @Override
     public void updateProgress(int max, int progress) {
         progressbar.setMax(max);
         progressbar.setProgress(progress);
-        if(progress == max) {
+        if (progress == max) {
             hideSearchProgress();
         }
     }
@@ -126,5 +127,21 @@ public class SmbActivity extends FullscreenActivity implements ISmbView {
     @Override
     public void hideSearchProgress() {
         progressbar.setVisibility(View.GONE);
+        if(servers.size() == 0) {
+            Log.i("tag", "no Result!!!");
+            showNoResult();
+        }
+    }
+
+    @Override
+    public void showNoResult() {
+        searchImage.stopFloat();
+        searchImage.setImageResource(R.mipmap.ic_launcher);
+    }
+
+    @Override
+    public void onBackPressed() {
+//        super.onBackPressed();
+        hideSearchProgress();
     }
 }

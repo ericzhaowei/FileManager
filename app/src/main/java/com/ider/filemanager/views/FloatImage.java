@@ -122,4 +122,8 @@ public class FloatImage extends ImageView {
         animator.start();
     }
 
+    public void stopFloat() {
+        animator.pause();
+    }
+
 }

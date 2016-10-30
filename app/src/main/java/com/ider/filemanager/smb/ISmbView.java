@@ -11,4 +11,5 @@ public interface ISmbView {
     public void hideSearchView();
     public void updateProgress(int max, int progress);
     public void hideSearchProgress();
+    public void showNoResult();
 }
