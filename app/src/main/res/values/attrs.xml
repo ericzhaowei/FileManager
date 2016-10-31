@@ -12,6 +12,7 @@
         <attr name="text" format="reference" />
         <attr name="textColor" format="color" />
         <attr name="textSize" format="dimension" />
+        <attr name="textWidth" format="dimension" />
     </declare-styleable>
 
     <declare-styleable name="SmbProgressbar">

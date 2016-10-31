@@ -136,12 +136,8 @@ public class SmbActivity extends FullscreenActivity implements ISmbView {
     @Override
     public void showNoResult() {
         searchImage.stopFloat();
-        searchImage.setImageResource(R.mipmap.ic_launcher);
+        searchImage.setImageResource(R.drawable.ic_search_blue_grey_300_48dp);
+        searchImage.setText(R.string.smb_noresult);
     }
 
-    @Override
-    public void onBackPressed() {
-//        super.onBackPressed();
-        hideSearchProgress();
-    }
 }

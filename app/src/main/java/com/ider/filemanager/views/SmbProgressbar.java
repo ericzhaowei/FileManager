@@ -119,7 +119,7 @@ public class SmbProgressbar extends ProgressBar {
     }
 
     public int measureHeight(int heightMeasureSpec) {
-        int result = 0;
+        int result;
         int heightMode = MeasureSpec.getMode(heightMeasureSpec);
         int height = MeasureSpec.getSize(heightMeasureSpec);
         if(heightMode == MeasureSpec.EXACTLY) {

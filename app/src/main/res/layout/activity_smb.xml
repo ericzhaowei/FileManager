@@ -36,6 +36,7 @@
         app:radius="13dp"
         app:text="@string/smb_searching"
         app:textColor="#90A4AE"
-        app:textSize="13sp"/>
+        app:textSize="13sp"
+        app:textWidth="160dp"/>
 
 </RelativeLayout>

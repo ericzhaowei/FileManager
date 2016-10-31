@@ -1,5 +1,6 @@
 package com.ider.filemanager.views;
 
+import android.animation.Animator;
 import android.animation.ValueAnimator;
 import android.content.Context;
 import android.content.res.TypedArray;
@@ -8,6 +9,7 @@ import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.Typeface;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.animation.LinearInterpolator;
 import android.widget.ImageView;
 
@@ -31,11 +33,11 @@ public class FloatImage extends ImageView {
     private int mImageHeight;
     private int mTextColor;
     private int mTextSize;
+    private int mTextWidth;
 
     private ValueAnimator animator;
     private String text;
     private Paint textPaint;
-    private Rect textBounds;
 
     public FloatImage(Context context) {
         super(context);
@@ -55,8 +57,10 @@ public class FloatImage extends ImageView {
             text = getResources().getString(textId);
             mTextColor = array.getColor(R.styleable.FloatImage_textColor, DEFAULT_TEXT_COLOR);
             mTextSize = (int) array.getDimension(R.styleable.FloatImage_textSize, DimenUtil.sp2px(context.getResources(), DEFAULT_TEXT_SIZE));
+            mTextWidth = (int) array.getDimension(R.styleable.FloatImage_textWidth, mImageWidth + 2*mRadius);
             setupTextPaint();
         }
+        array.recycle();
         setupAnimator();
 
     }
@@ -66,8 +70,6 @@ public class FloatImage extends ImageView {
         textPaint.setTypeface(Typeface.DEFAULT_BOLD);
         textPaint.setTextSize(mTextSize);
         textPaint.setColor(mTextColor);
-        textBounds = new Rect();
-        textPaint.getTextBounds(text, 0, text.length(), textBounds);
     }
 
     private void setupAnimator() {
@@ -76,14 +78,16 @@ public class FloatImage extends ImageView {
         animator.setDuration(1000);
         animator.setInterpolator(new LinearInterpolator());
         animator.addUpdateListener(animatorUpdateListener);
+        animator.addListener(animatorListener);
         animator.setRepeatCount(ValueAnimator.INFINITE);
         startFloat();
     }
 
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-
-        setMeasuredDimension(mImageWidth + 2*mRadius, mImageHeight + 2*mRadius + textBounds.height());
+        int width = Math.max(mImageWidth + 2*mRadius, mTextWidth);
+        int height = (int) (mImageHeight + 2*mRadius + textPaint.descent() - textPaint.ascent());
+        setMeasuredDimension(width, height);
     }
 
     @Override
@@ -94,11 +98,12 @@ public class FloatImage extends ImageView {
             return;
         }
 
-        int width = textBounds.width();
-        int height = textBounds.height();
 
-        int x = (getWidth() - width) / 2;
-        int y = getHeight() - 5;
+        float width = textPaint.measureText(text);
+        float height = textPaint.ascent() + textPaint.descent();
+
+        int x = (int) ((getWidth() - width) / 2);
+        int y = getHeight() - (int)textPaint.descent();
 
         canvas.drawText(text, 0, text.length(), x, y, textPaint);
 
@@ -109,11 +114,38 @@ public class FloatImage extends ImageView {
         public void onAnimationUpdate(ValueAnimator valueAnimator) {
             float value = (float) valueAnimator.getAnimatedValue();
 
-            float left = mRadius * (1 + (float) Math.sin(Math.toRadians(value)));
+            // 该值表示默认的左padding，其值为(getWidth() - (mImageWidth + 2*mRadius)) / 2
+            // 当textWidth等于mImageWidth + 2*mRadius时，该值为0
+            float leftBase = (getWidth() - (mImageWidth + 2*mRadius)) / 2;
+            float left = leftBase + mRadius * (1 + (float) Math.sin(Math.toRadians(value)));
             float top = mRadius * (1 - (float) Math.cos(Math.toRadians(value)));
             float right = getWidth() - mImageWidth - left;
             float bottom = getHeight() - mImageHeight - top;
             setPadding((int) left, (int) top, (int) right, (int) bottom);
+        }
+    };
+
+    Animator.AnimatorListener animatorListener = new Animator.AnimatorListener() {
+        @Override
+        public void onAnimationStart(Animator animation) {
+
+        }
+
+        @Override
+        public void onAnimationEnd(Animator animation) {
+
+        }
+
+        @Override
+        public void onAnimationCancel(Animator animation) {
+            int left = (getWidth() - mImageWidth) / 2;
+            int top = (getHeight() - mImageHeight) / 2;
+            setPadding(left, top, left, top);
+        }
+
+        @Override
+        public void onAnimationRepeat(Animator animation) {
+
         }
     };
 
@@ -123,7 +155,11 @@ public class FloatImage extends ImageView {
     }
 
     public void stopFloat() {
-        animator.pause();
+        animator.cancel();
+    }
+
+    public void setText(int resId) {
+        text = getResources().getString(resId);
     }
 
 }

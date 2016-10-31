@@ -1,4 +1,5 @@
 <resources>
     <string name="app_name">文件管理</string>
     <string name="smb_searching">正在搜索…</string>
+    <string name="smb_noresult">没有共享文件，点击重试</string>
 </resources>
