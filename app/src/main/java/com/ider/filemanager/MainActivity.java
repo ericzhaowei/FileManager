@@ -7,7 +7,16 @@ import android.view.View;
 import android.widget.Button;
 
 import com.ider.filemanager.smb.ISmbView;
+import com.ider.filemanager.smb.SmbHost;
 import com.ider.filemanager.smb.SmbPresenter;
+
+import java.net.MalformedURLException;
+
+import jcifs.smb.SmbFile;
+import rx.Observable;
+import rx.functions.Action1;
+import rx.functions.Func1;
+import rx.schedulers.Schedulers;
 
 public class MainActivity extends FullscreenActivity implements View.OnClickListener {
 

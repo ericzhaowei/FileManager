@@ -20,7 +20,7 @@
         </activity>
         
         <activity android:name=".SmbActivity"
-            android:screenOrientation="landscape"/>
+            android:screenOrientation="sensor"/>
     </application>
 
 </manifest>

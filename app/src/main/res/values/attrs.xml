@@ -13,6 +13,8 @@
         <attr name="textColor" format="color" />
         <attr name="textSize" format="dimension" />
         <attr name="textWidth" format="dimension" />
+        <attr name="startImage" format="reference"/>
+        <attr name="stopImage" format="reference"/>
     </declare-styleable>
 
     <declare-styleable name="SmbProgressbar">

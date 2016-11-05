@@ -33,6 +33,6 @@ public class SmbItemDecorator extends RecyclerView.ItemDecoration {
          * right:item右边留出的长度
          * bottom:item下边留出的宽度
          */
-        outRect.set(20, 0, 20, 0);
+        outRect.set(30, 20, 30, 20);
     }
 }

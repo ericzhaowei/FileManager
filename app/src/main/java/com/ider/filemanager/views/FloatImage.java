@@ -34,33 +34,37 @@ public class FloatImage extends ImageView {
     private int mTextColor;
     private int mTextSize;
     private int mTextWidth;
+    private int mStopImageResource;
+    private int mStartImageResource;
 
     private ValueAnimator animator;
     private String text;
     private Paint textPaint;
 
     public FloatImage(Context context) {
-        super(context);
-        setupAnimator();
-
+        this(context, null);
     }
 
     public FloatImage(Context context, AttributeSet attrs) {
         super(context, attrs);
         TypedArray array = context.obtainStyledAttributes(attrs, R.styleable.FloatImage);
-        mRadius = (int) array.getDimension(R.styleable.FloatImage_radius, DimenUtil.dp2px(context.getResources(), DEFAULT_RADIUS));
-        mImageWidth = (int) array.getDimension(R.styleable.FloatImage_image_width, DimenUtil.dp2px(context.getResources(), DEFAULT_IMAGE_WIDTH));
-        mImageHeight = (int) array.getDimension(R.styleable.FloatImage_image_height, DimenUtil.dp2px(context.getResources(), DEFAULT_IMAGE_HEIGHT));
+        if (array != null) {
+            mRadius = (int) array.getDimension(R.styleable.FloatImage_radius, DimenUtil.dp2px(context.getResources(), DEFAULT_RADIUS));
+            mImageWidth = (int) array.getDimension(R.styleable.FloatImage_image_width, DimenUtil.dp2px(context.getResources(), DEFAULT_IMAGE_WIDTH));
+            mImageHeight = (int) array.getDimension(R.styleable.FloatImage_image_height, DimenUtil.dp2px(context.getResources(), DEFAULT_IMAGE_HEIGHT));
+            mStopImageResource = array.getResourceId(R.styleable.FloatImage_stopImage, 0);
+            mStartImageResource = array.getResourceId(R.styleable.FloatImage_startImage, 0);
 
-        int textId = array.getResourceId(R.styleable.FloatImage_text, 0);
-        if(textId != 0) {
-            text = getResources().getString(textId);
-            mTextColor = array.getColor(R.styleable.FloatImage_textColor, DEFAULT_TEXT_COLOR);
-            mTextSize = (int) array.getDimension(R.styleable.FloatImage_textSize, DimenUtil.sp2px(context.getResources(), DEFAULT_TEXT_SIZE));
-            mTextWidth = (int) array.getDimension(R.styleable.FloatImage_textWidth, mImageWidth + 2*mRadius);
-            setupTextPaint();
+            int textId = array.getResourceId(R.styleable.FloatImage_text, 0);
+            if (textId != 0) {
+                text = getResources().getString(textId);
+                mTextColor = array.getColor(R.styleable.FloatImage_textColor, DEFAULT_TEXT_COLOR);
+                mTextSize = (int) array.getDimension(R.styleable.FloatImage_textSize, DimenUtil.sp2px(context.getResources(), DEFAULT_TEXT_SIZE));
+                mTextWidth = (int) array.getDimension(R.styleable.FloatImage_textWidth, mImageWidth + 2 * mRadius);
+                setupTextPaint();
+            }
+            array.recycle();
         }
-        array.recycle();
         setupAnimator();
 
     }
@@ -80,13 +84,12 @@ public class FloatImage extends ImageView {
         animator.addUpdateListener(animatorUpdateListener);
         animator.addListener(animatorListener);
         animator.setRepeatCount(ValueAnimator.INFINITE);
-        startFloat();
     }
 
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-        int width = Math.max(mImageWidth + 2*mRadius, mTextWidth);
-        int height = (int) (mImageHeight + 2*mRadius + textPaint.descent() - textPaint.ascent());
+        int width = Math.max(mImageWidth + 2 * mRadius, mTextWidth);
+        int height = (int) (mImageHeight + 2 * mRadius + textPaint.descent() - textPaint.ascent());
         setMeasuredDimension(width, height);
     }
 
@@ -94,7 +97,7 @@ public class FloatImage extends ImageView {
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
 
-        if(textPaint == null) {
+        if (textPaint == null) {
             return;
         }
 
@@ -103,7 +106,7 @@ public class FloatImage extends ImageView {
         float height = textPaint.ascent() + textPaint.descent();
 
         int x = (int) ((getWidth() - width) / 2);
-        int y = getHeight() - (int)textPaint.descent();
+        int y = getHeight() - (int) textPaint.descent();
 
         canvas.drawText(text, 0, text.length(), x, y, textPaint);
 
@@ -113,10 +116,9 @@ public class FloatImage extends ImageView {
         @Override
         public void onAnimationUpdate(ValueAnimator valueAnimator) {
             float value = (float) valueAnimator.getAnimatedValue();
-
             // 该值表示默认的左padding，其值为(getWidth() - (mImageWidth + 2*mRadius)) / 2
             // 当textWidth等于mImageWidth + 2*mRadius时，该值为0
-            float leftBase = (getWidth() - (mImageWidth + 2*mRadius)) / 2;
+            float leftBase = (getWidth() - (mImageWidth + 2 * mRadius)) / 2;
             float left = leftBase + mRadius * (1 + (float) Math.sin(Math.toRadians(value)));
             float top = mRadius * (1 - (float) Math.cos(Math.toRadians(value)));
             float right = getWidth() - mImageWidth - left;
@@ -150,16 +152,21 @@ public class FloatImage extends ImageView {
     };
 
 
-    public void startFloat() {
+    public void startFloat(int resId) {
         animator.start();
-    }
-
-    public void stopFloat() {
-        animator.cancel();
-    }
-
-    public void setText(int resId) {
         text = getResources().getString(resId);
+        if (mStartImageResource != 0) {
+            setImageResource(mStartImageResource);
+        }
     }
+
+    public void stopFloat(int resId) {
+        animator.cancel();
+        text = getResources().getString(resId);
+        if(mStopImageResource != 0) {
+            setImageResource(mStopImageResource);
+        }
+    }
+
 
 }

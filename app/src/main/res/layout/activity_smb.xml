@@ -1,27 +1,51 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+    android:background="#373737">
+    
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/smb_toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="#000000">
+
+        <com.ider.filemanager.views.SmbToolTitle
+            android:id="@+id/smb_toolbar_title_view"
+            android:layout_width="@dimen/smb_titlebar_title_width"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"/>
+
+    </android.support.v7.widget.Toolbar>
+    
+    <android.support.v4.view.ViewPager
+        android:id="@+id/content_pager"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@id/smb_toolbar"/>
+
+    <TextView
+        android:id="@+id/page_description"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="13sp"
+        android:textColor="#9d9a9a"
+        android:layout_below="@id/smb_toolbar"
+        android:layout_marginLeft="10dp"
+        android:layout_marginTop="20dp"/>
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/smb_group"
         android:layout_width="match_parent"
-        android:layout_height="@dimen/smb_server_group_height"
-        android:layout_centerVertical="true">
+        android:layout_height="match_parent"
+        android:layout_below="@id/page_description"
+        android:layout_centerVertical="true"
+        >
 
     </android.support.v7.widget.RecyclerView>
 
-    <com.ider.filemanager.views.SmbProgressbar
-        android:id="@+id/smb_progress"
-        android:layout_width="match_parent"
-        android:layout_height="30dp"
-        android:paddingLeft="30dp"
-        android:paddingRight="30dp"
-        app:reach_height="3dp"
-        app:reach_color="#0fa556"
-        app:unreach_color="#0fa556"
-        app:text_color="#0fa556"/>
+
 
     <com.ider.filemanager.views.FloatImage
         android:id="@+id/smb_searching"
@@ -30,13 +54,14 @@
         android:scaleType="fitXY"
         android:layout_centerInParent="true"
         android:contentDescription="@null"
-        android:src="@drawable/ic_search_blue_grey_300_48dp"
+        app:startImage="@drawable/ic_search_blue_grey_300_48dp"
+        app:stopImage="@drawable/ic_youtube_searched_for_blue_grey_300_48dp"
         app:image_width="50dp"
         app:image_height="50dp"
         app:radius="13dp"
         app:text="@string/smb_searching"
         app:textColor="#90A4AE"
         app:textSize="13sp"
-        app:textWidth="160dp"/>
+        app:textWidth="160dp" />
 
 </RelativeLayout>
