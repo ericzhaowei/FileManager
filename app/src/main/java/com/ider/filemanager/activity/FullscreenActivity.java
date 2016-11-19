@@ -1,4 +1,4 @@
-package com.ider.filemanager;
+package com.ider.filemanager.activity;
 
 import android.app.Activity;
 import android.os.Build;

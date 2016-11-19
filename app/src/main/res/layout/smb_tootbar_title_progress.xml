@@ -14,7 +14,7 @@
         app:unreach_color="#848484"
         app:text_color="#ffffff"
         android:visibility="gone"
-        android:layout_gravity="center"/>
+        android:layout_gravity="center" />
 
     <TextView
         android:id="@+id/smb_toolbar_title"

@@ -1,4 +1,4 @@
-package com.ider.filemanager;
+package com.ider.filemanager.smb;
 
 import android.content.Context;
 import android.content.res.TypedArray;
@@ -6,7 +6,10 @@ import android.graphics.Canvas;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.View;
+
+import com.ider.filemanager.R;
 
 /**
  * Created by ider-eric on 2016/10/26.
@@ -17,12 +20,22 @@ public class SmbItemDecorator extends RecyclerView.ItemDecoration {
     private Drawable mDiver;
 
     public SmbItemDecorator(Context context) {
-        int[] attrs = new int[]{android.R.attr.listDivider};
-        TypedArray ta = context.obtainStyledAttributes(attrs);
-        mDiver = ta.getDrawable(0);
-        ta.recycle();
+        mDiver = context.getDrawable(R.drawable.line);
     }
 
+
+    @Override
+    public void onDraw(Canvas c, RecyclerView parent, RecyclerView.State state) {
+        // draw diver
+        for(int i = 0; i < parent.getChildCount(); i++) {
+            Log.i("tag", "onDraw itemDecorator");
+            View child = parent.getChildAt(i);
+            int top = child.getBottom();
+            int bottom = top + mDiver.getIntrinsicHeight();
+            mDiver.setBounds(0, top, parent.getWidth(), bottom);
+            mDiver.draw(c);
+        }
+    }
 
     @Override
     public void getItemOffsets(Rect outRect, View view, RecyclerView parent, RecyclerView.State state) {
@@ -33,6 +46,6 @@ public class SmbItemDecorator extends RecyclerView.ItemDecoration {
          * right:item右边留出的长度
          * bottom:item下边留出的宽度
          */
-        outRect.set(30, 20, 30, 20);
+        outRect.set(0, 0, 0, 0);
     }
 }

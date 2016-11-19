@@ -4,6 +4,11 @@
     <item
         android:id="@+id/smb_menu_refresh"
         android:title="@string/smb_refresh"
-        android:onClick="refreshClicked"/>
+        android:onClick="menuRefreshClicked"/>
+
+    <item
+        android:id="@+id/smb_menu_stop"
+        android:title="@string/smb_stop_search"
+        android:onClick="menuStopClicked"/>
 
 </menu>

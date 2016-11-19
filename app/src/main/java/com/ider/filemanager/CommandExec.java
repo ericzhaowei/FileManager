@@ -1,4 +1,4 @@
-package com.ider.filemanager.smb;
+package com.ider.filemanager;
 
 
 import java.io.BufferedInputStream;

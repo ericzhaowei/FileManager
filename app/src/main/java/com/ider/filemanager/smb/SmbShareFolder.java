@@ -4,7 +4,7 @@ package com.ider.filemanager.smb;
  * Created by ider-eric on 2016/11/3.
  */
 
-public class SmbShare {
+public class SmbShareFolder {
     private String server;
     private String name;
 
@@ -23,4 +23,6 @@ public class SmbShare {
     public String getName() {
         return name;
     }
+
+
 }

@@ -4,10 +4,14 @@ import android.animation.Animator;
 import android.animation.ValueAnimator;
 import android.content.Context;
 import android.content.res.TypedArray;
+import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.Typeface;
+import android.graphics.drawable.BitmapDrawable;
+import android.os.Bundle;
+import android.os.Parcelable;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.animation.LinearInterpolator;
@@ -22,6 +26,9 @@ import com.ider.filemanager.R;
 
 public class FloatImage extends ImageView {
 
+    private boolean DEBUG = true;
+    private String TAG = "FloatImage";
+
     private int DEFAULT_RADIUS = 33;  //dp
     private int DEFAULT_IMAGE_WIDTH = 0; //dp
     private int DEFAULT_IMAGE_HEIGHT = 0; //dp
@@ -34,12 +41,17 @@ public class FloatImage extends ImageView {
     private int mTextColor;
     private int mTextSize;
     private int mTextWidth;
-    private int mStopImageResource;
-    private int mStartImageResource;
+
 
     private ValueAnimator animator;
     private String text;
     private Paint textPaint;
+    private int paddingLeft, paddingTop, paddingRight, paddingBottom;
+
+
+    private void LOG(String log) {
+        if(DEBUG) Log.i(TAG, log);
+    }
 
     public FloatImage(Context context) {
         this(context, null);
@@ -52,8 +64,6 @@ public class FloatImage extends ImageView {
             mRadius = (int) array.getDimension(R.styleable.FloatImage_radius, DimenUtil.dp2px(context.getResources(), DEFAULT_RADIUS));
             mImageWidth = (int) array.getDimension(R.styleable.FloatImage_image_width, DimenUtil.dp2px(context.getResources(), DEFAULT_IMAGE_WIDTH));
             mImageHeight = (int) array.getDimension(R.styleable.FloatImage_image_height, DimenUtil.dp2px(context.getResources(), DEFAULT_IMAGE_HEIGHT));
-            mStopImageResource = array.getResourceId(R.styleable.FloatImage_stopImage, 0);
-            mStartImageResource = array.getResourceId(R.styleable.FloatImage_startImage, 0);
 
             int textId = array.getResourceId(R.styleable.FloatImage_text, 0);
             if (textId != 0) {
@@ -68,6 +78,7 @@ public class FloatImage extends ImageView {
         setupAnimator();
 
     }
+
 
     private void setupTextPaint() {
         textPaint = new Paint();
@@ -91,16 +102,18 @@ public class FloatImage extends ImageView {
         int width = Math.max(mImageWidth + 2 * mRadius, mTextWidth);
         int height = (int) (mImageHeight + 2 * mRadius + textPaint.descent() - textPaint.ascent());
         setMeasuredDimension(width, height);
+        setupInitPaddings();
     }
+
 
     @Override
     protected void onDraw(Canvas canvas) {
-        super.onDraw(canvas);
+        Bitmap bitmap = ((BitmapDrawable)getDrawable()).getBitmap();
+        canvas.drawBitmap(bitmap, paddingLeft, paddingTop, textPaint);
 
         if (textPaint == null) {
             return;
         }
-
 
         float width = textPaint.measureText(text);
         float height = textPaint.ascent() + textPaint.descent();
@@ -112,6 +125,7 @@ public class FloatImage extends ImageView {
 
     }
 
+
     ValueAnimator.AnimatorUpdateListener animatorUpdateListener = new ValueAnimator.AnimatorUpdateListener() {
         @Override
         public void onAnimationUpdate(ValueAnimator valueAnimator) {
@@ -119,11 +133,12 @@ public class FloatImage extends ImageView {
             // 该值表示默认的左padding，其值为(getWidth() - (mImageWidth + 2*mRadius)) / 2
             // 当textWidth等于mImageWidth + 2*mRadius时，该值为0
             float leftBase = (getWidth() - (mImageWidth + 2 * mRadius)) / 2;
-            float left = leftBase + mRadius * (1 + (float) Math.sin(Math.toRadians(value)));
-            float top = mRadius * (1 - (float) Math.cos(Math.toRadians(value)));
-            float right = getWidth() - mImageWidth - left;
-            float bottom = getHeight() - mImageHeight - top;
-            setPadding((int) left, (int) top, (int) right, (int) bottom);
+            paddingLeft = (int) (leftBase + mRadius * (1 + (float) Math.sin(Math.toRadians(value))));
+            paddingTop = (int) (mRadius * (1 - (float) Math.cos(Math.toRadians(value))));
+            paddingRight = getWidth() - mImageWidth - paddingLeft;
+            paddingBottom = getHeight() - mImageHeight - paddingTop;
+            invalidate();
+
         }
     };
 
@@ -140,9 +155,7 @@ public class FloatImage extends ImageView {
 
         @Override
         public void onAnimationCancel(Animator animation) {
-            int left = (getWidth() - mImageWidth) / 2;
-            int top = (getHeight() - mImageHeight) / 2;
-            setPadding(left, top, left, top);
+            setupInitPaddings();
         }
 
         @Override
@@ -151,21 +164,27 @@ public class FloatImage extends ImageView {
         }
     };
 
-
-    public void startFloat(int resId) {
-        animator.start();
-        text = getResources().getString(resId);
-        if (mStartImageResource != 0) {
-            setImageResource(mStartImageResource);
-        }
+    public void setupInitPaddings() {
+        paddingLeft = (getWidth() - mImageWidth) / 2;
+        paddingTop = (getHeight() - mImageHeight) / 2;
+        paddingRight = paddingLeft;
+        paddingBottom = paddingTop;
+        requestLayout();
     }
 
-    public void stopFloat(int resId) {
+
+    public void startFloat(int imageRes, int textRes) {
+        animator.start();
+        text = getResources().getString(textRes);
+        setImageResource(imageRes);
+    }
+
+    public void stopFloat(int imageRes, int textRes) {
+
         animator.cancel();
-        text = getResources().getString(resId);
-        if(mStopImageResource != 0) {
-            setImageResource(mStopImageResource);
-        }
+        text = getResources().getString(textRes);
+
+        setImageResource(imageRes);
     }
 
 

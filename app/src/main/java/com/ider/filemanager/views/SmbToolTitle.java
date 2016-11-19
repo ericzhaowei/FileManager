@@ -1,7 +1,10 @@
 package com.ider.filemanager.views;
 
 import android.content.Context;
+import android.os.Bundle;
+import android.os.Parcelable;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.FrameLayout;
@@ -15,8 +18,15 @@ import com.ider.filemanager.R;
 
 public class SmbToolTitle extends FrameLayout {
 
+    String TAG = "SmbToolTitle";
+    boolean DEBUG = true;
+
     TextView title;
     SmbProgressbar progressbar;
+
+    private void LOG(String log) {
+        if(DEBUG) Log.i(TAG, log);
+    }
 
     public SmbToolTitle(Context context) {
         this(context, null);
@@ -49,6 +59,7 @@ public class SmbToolTitle extends FrameLayout {
     }
 
     public void setProgress(int progress) {
+        LOG("setProgress");
         progressbar.setProgress(progress);
     }
 

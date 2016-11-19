@@ -4,8 +4,11 @@ import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Canvas;
 import android.graphics.Paint;
+import android.os.Bundle;
+import android.os.Parcelable;
 import android.util.AttributeSet;
 import android.util.Log;
+import android.view.View;
 import android.widget.ProgressBar;
 
 import com.ider.filemanager.DimenUtil;
@@ -16,6 +19,10 @@ import com.ider.filemanager.R;
  */
 
 public class SmbProgressbar extends ProgressBar {
+
+    private String TAG = "SmbProgressbar";
+    private boolean DEBUG = true;
+
 
     private static final int DEFAULT_REACH_HEIGHT = 5; // dp
     private static final int DEFAULT_UNREACH_HEIGHT = 2; // dp
@@ -33,9 +40,16 @@ public class SmbProgressbar extends ProgressBar {
     private int mUnReachColor = DEFAULT_UNREACH_COLOR;
     private int mTextColor = DEFAULT_TEXT_COLOR;
     private int mTextSize = DimenUtil.sp2px(getResources(), DEFAULT_TEXT_SIZE);
-    private int mTextOffset;
+    private int mTextOffset = 10;
+    private int progress = 0;
+    private int maxProgress = 100;
 
     private Paint mPaint;
+
+
+    private void LOG(String log) {
+        if (DEBUG) Log.i(TAG, log);
+    }
 
     public SmbProgressbar(Context context) {
         this(context, null);
@@ -48,9 +62,8 @@ public class SmbProgressbar extends ProgressBar {
 
     public SmbProgressbar(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
-
         TypedArray array = context.obtainStyledAttributes(attrs, R.styleable.SmbProgressbar);
-        if(array != null) {
+        if (array != null) {
             mReachHeight = (int) array.getDimension(R.styleable.SmbProgressbar_reach_height, mReachHeight);
             mUnReachHeight = (int) array.getDimension(R.styleable.SmbProgressbar_unreach_height, mUnReachHeight);
             mReachColor = array.getColor(R.styleable.SmbProgressbar_reach_color, mReachColor);
@@ -63,53 +76,47 @@ public class SmbProgressbar extends ProgressBar {
         setupPaint();
     }
 
+
     private void setupPaint() {
         mPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
         mPaint.setTextSize(mTextSize);
     }
 
     @Override
-    protected synchronized void onDraw(Canvas canvas) {
-        super.onDraw(canvas);
+    protected void onDraw(Canvas canvas) {
+
         canvas.save();
+        canvas.translate(getPaddingLeft(), mRealHeight / 2);
 
-        canvas.translate(getPaddingLeft(), mRealHeight/2);
-
-        float percent = getProgress() * 1.0f / (float)getMax();
+        float percent = getProgress() * 1.0f / (float) getMax();
         String text = (int) (percent * 100) + "%";
         int textWidth = (int) mPaint.measureText(text);
-        int textHeight = (int) (mPaint.descent() + mPaint.ascent());
-        mTextOffset = textWidth + 40;
+        int textHeight = (int) (mPaint.descent() - mPaint.ascent());
+
         // draw reach line
         mPaint.setStrokeWidth(mReachHeight);
         mPaint.setColor(mReachColor);
-        int endX = (int) (mRealWidth * percent - mTextOffset / 2);
-        endX = Math.max(0, endX);
+        int endX = (int) ((mRealWidth - textWidth - 2 * mTextOffset) * percent);
         canvas.drawLine(0, 0, endX, 0, mPaint);
 
         // draw text
         mPaint.setTextSize(mTextSize);
         mPaint.setColor(mTextColor);
-        int textX = endX + (mTextOffset - textWidth) / 2;
-        int textY = -textHeight / 2;
+        int textX = endX + mTextOffset;
+        int textY = (getHeight() - textHeight) / 2;
         canvas.drawText(text, textX, textY, mPaint);
 
         // draw unReach line
-        if(endX + mTextOffset < mRealWidth) {
-            mPaint.setColor(mUnReachColor);
-            mPaint.setStrokeWidth(mUnReachHeight);
-            int unReachStartX = endX + mTextOffset;
-            canvas.drawLine(unReachStartX, 0, mRealWidth, 0, mPaint);
-        }
-
-
+        mPaint.setColor(mUnReachColor);
+        mPaint.setStrokeWidth(mUnReachHeight);
+        int unReachStartX = textX + textWidth + mTextOffset;
+        canvas.drawLine(unReachStartX, 0, mRealWidth, 0, mPaint);
         canvas.restore();
     }
 
 
-
     @Override
-    protected synchronized void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         int width = MeasureSpec.getSize(widthMeasureSpec);
         int height = measureHeight(heightMeasureSpec);
         setMeasuredDimension(width, height);
@@ -122,15 +129,16 @@ public class SmbProgressbar extends ProgressBar {
         int result;
         int heightMode = MeasureSpec.getMode(heightMeasureSpec);
         int height = MeasureSpec.getSize(heightMeasureSpec);
-        if(heightMode == MeasureSpec.EXACTLY) {
+        if (heightMode == MeasureSpec.EXACTLY) {
             result = height;
         } else {
             int textHeight = (int) (mPaint.descent() + mPaint.ascent());
             result = Math.max(Math.max(mReachHeight, mUnReachHeight), textHeight) + getPaddingTop() + getPaddingBottom();
-            if(heightMode == MeasureSpec.AT_MOST) {
+            if (heightMode == MeasureSpec.AT_MOST) {
                 result = Math.min(result, height);
             }
         }
         return result;
     }
+
 }

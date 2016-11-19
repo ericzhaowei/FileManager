@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shape xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!--颜色渐变-->
+    <gradient
+        android:startColor="#4b4b4b"
+        android:endColor="#4b4b4b"
+        android:angle="90"/>
+
+    <!--尺寸-->
+    <size
+        android:height="0.2dp"/>
+
+
+    <!--corners 圆角-->
+    <!--solid 填充-->
+    <!--padding 间隔-->
+    <!--stroke 描边-->
+</shape>

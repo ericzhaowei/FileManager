@@ -19,15 +19,15 @@ import jcifs.smb.SmbFile;
  * Created by ider-eric on 2016/10/21.
  */
 
-public class SmbUtil {
+public class SmbSearchUtil {
 
-    private static boolean DEBUG = false;
+    private static boolean DEBUG = true;
     private static String TAG = "SmbUtil";
 
     public final static int SMB_SEARCH_UPDATE = 100;
     public final static String mDirSmb = "SMB";
 
-    private ISmbUpdateListener updateListener;
+    private ISmb.ISmbSearchListener updateListener;
     private boolean searchInterupt;
     private int startThread, overThread;
     private int THREAD_MAX = 16;
@@ -40,42 +40,37 @@ public class SmbUtil {
         }
     }
 
-    public SmbUtil(ISmbUpdateListener updateListener) {
+    public SmbSearchUtil(ISmb.ISmbSearchListener updateListener) {
         this.updateListener = updateListener;
     }
 
 
-    public void searchSmbHost() {
+    public void searchSmbHost(int startProgress) {
         searchInterupt = false;
-        startThread = 0;
-        overThread = 0;
+        startThread = startProgress;
+        overThread = startProgress;
         Vector<Vector<InetAddress>> vectorList = Lan.getSubnetAddress();
 
-        THREAD_TOTAL = 0;
+        List<InetAddress> addrs = new Vector<>();
+
         for(int i = 0; i < vectorList.size(); i++) {
-            Vector<InetAddress> addrs = vectorList.get(i);
-            THREAD_TOTAL += addrs.size();
+            addrs.addAll(vectorList.get(i));
         }
+        THREAD_TOTAL = addrs.size();
+        LOG("TOTAL is " + THREAD_TOTAL);
+        pingInetAddressLists(addrs);
 
-        for (int i = 0; i < vectorList.size(); i++) {
-            if(searchInterupt) {
-                return;
-            }
-
-            Vector<InetAddress> addrs = vectorList.get(i);
-
-            pingInetAddressLists(addrs);
-
-        }
     }
 
     private void pingInetAddressLists(List<InetAddress> hosts) {
-        for (int i = 0; i < hosts.size();) {
+        // 从overThread开始，当屏幕旋转导致对象重建时，可继续从上次的点开始
+        for (int i = overThread; i < hosts.size();) {
             if(searchInterupt) {
                 return;
             }
             int activeThread = startThread - overThread;
             if(activeThread < THREAD_MAX) {
+                LOG("ping : " + hosts.get(i).getHostAddress());
                 Thread scan = new Thread(new ConnectHost(hosts.get(i).getHostAddress()));
                 scan.setPriority(10);
                 scan.start();
@@ -114,7 +109,6 @@ public class SmbUtil {
     }
 
 
-
     public void checkSavadHost(List<String> savedHosts) {
         searchInterupt = false;
         startThread = 0;
@@ -122,8 +116,6 @@ public class SmbUtil {
         THREAD_TOTAL = savedHosts.size();
         pingIpLists(savedHosts);
     }
-
-
 
 
     private class ConnectHost implements Runnable {
@@ -136,18 +128,25 @@ public class SmbUtil {
 
         @Override
         public void run() {
-//            Log.i("tag", "ping = " + hostIp);
             if(Lan.ping(hostIp)) {
                 if(searchInterupt) {
                     return;
                 }
                 sendAvailableHost(hostIp);
             }
-            overThread++;
-            searchInterupt = overThread == THREAD_TOTAL;
-            updateListener.onProgressUpdate(THREAD_TOTAL, overThread);
+            if(searchInterupt) {
+                return;
+            }
+            addToOverThread();
         }
     }
+
+    private synchronized void addToOverThread() {
+        overThread++;
+        searchInterupt = overThread == THREAD_TOTAL;
+        updateListener.onProgressUpdate(THREAD_TOTAL, overThread);
+    }
+
 
     private synchronized void sendAvailableHost(String hostIp) {
         String server = mDirSmb + File.separator + hostIp;
@@ -157,84 +156,12 @@ public class SmbUtil {
 
     public void interuptSearch() {
         searchInterupt = true;
-        updateListener.onSearchInterupt();
     }
 
 
     public boolean isSearching() {
         return !searchInterupt;
     }
-
-
-
-    /**
-     * 判断指定host地址是否已经挂载
-     * @param hostPath 指定host的共享目录,如//192.168.1.100/share
-     * @return 如果已挂载，返回挂载点，否则返回null
-     */
-    public String isMounted(String hostPath) {
-        ArrayList<String> mountMsg = CommandExec.execCommand("mount");
-        if(mountMsg == null) {
-            return null;
-        }
-        for (String mount : mountMsg) {
-            String[] msgs = mount.split(" ");
-            if(msgs.length < 3) {
-                continue;
-            }
-            if(msgs[2].equals("cifs")) {
-                if(msgs[0].equals(hostPath)) {
-                    return msgs[1];
-                }
-            }
-        }
-        return null;
-    }
-
-    /**
-     * 根据指定host获取其共享目录
-     * @param smbHost 指定的SmbHost对象
-     * @return 该ip下所有的共享目录
-     */
-    public ArrayList<String> getContentBySmbhost(SmbHost smbHost) {
-        String hostIp = smbHost.getHost();
-        String username = smbHost.getUsername();
-        String password = smbHost.getPassword();
-        boolean isPublic = smbHost.isPublic();
-
-        ArrayList<String> contents = new ArrayList<>();
-        SmbFile smbFile;
-        try{
-            if (isPublic) {
-                smbFile = new SmbFile(String.format("smb://guest:@%s/", hostIp));
-            } else {
-                smbFile = new SmbFile(String.format("smb://%s:%s@%s/", username, password, hostIp));
-
-            }
-            Log.i("tag", String.format("smb://%s:%s@%s/", username, password, hostIp));
-            String[] smbs = smbFile.list();
-            for (String smb : smbs) {
-                if(!smb.endsWith("$")) {
-                    Log.i("tag", "shared : " + smb);
-                    contents.add("//" + hostIp + "/" + smb);
-                }
-            }
-
-            updateListener.onLoginSuccess(smbHost);
-
-            return contents;
-        } catch (Exception e) {
-            Log.i("tag", e.getMessage());
-            if (e.getMessage().contains("unknown user name or bad password")) {
-                updateListener.onLoginFailed(smbHost, ISmbUpdateListener.LOGIN_FALIED_WRONG_USERNAME);
-            } else {
-                updateListener.onLoginFailed(smbHost, ISmbUpdateListener.LOGIN_FAILED_UNKNOWN);
-            }
-        }
-
-        return null;
-    }
-
 
 
 }

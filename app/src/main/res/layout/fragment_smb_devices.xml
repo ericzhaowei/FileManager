@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="10dp">
+
+    <TextView
+        android:id="@+id/device_page_description"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="14sp"
+        android:textColor="#686868"
+        android:layout_marginTop="10dp"
+        android:layout_marginBottom="10dp"/>
+
+    <LinearLayout
+        android:id="@+id/device_title_line"
+        android:layout_width="match_parent"
+        android:layout_height="0.1dp"
+        android:background="@drawable/line"
+        android:layout_below="@id/device_page_description"
+        android:orientation="horizontal" />
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/smb_group"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@id/device_title_line" />
+
+
+    <com.ider.filemanager.views.FloatImage
+        android:id="@+id/smb_searching"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:scaleType="fitXY"
+        android:layout_centerInParent="true"
+        android:contentDescription="@null"
+        app:image_width="46dp"
+        app:image_height="46dp"
+        app:radius="13dp"
+        app:text="@string/smb_searching"
+        app:textColor="#8e8e8e"
+        app:textSize="13sp"
+        app:textWidth="160dp" />
+
+</RelativeLayout>
